@@ -1,0 +1,40 @@
+# ==========================================
+# SecureDoc-RAG GitIgnore Rules
+# ==========================================
+
+# Secrets & Sensitive Credentials (CRITICAL - DO NOT COMMIT)
+credentials.json
+backend/app/core/credentials.json
+*.json.key
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Database & Uploaded File Payloads
+uploads/
+*.db
+*.sqlite3
+securedoc.db
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Node & Frontend Build Artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# System & OS Files
+.DS_Store
+Thumbs.db
