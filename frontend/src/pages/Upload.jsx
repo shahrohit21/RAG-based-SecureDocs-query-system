@@ -201,12 +201,25 @@ export const Upload = () => {
       {/* Success Banner */}
       {uploadedDoc && (
         <div className="card-premium p-6 border border-primary/30 space-y-4 animate-fadeIn">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-6 h-6 text-success shrink-0" />
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-6 h-6 text-success shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-display text-base font-bold text-foreground">Document Uploaded & Indexed Successfully</h4>
-              <p className="text-xs text-muted-foreground">
-                Your document is now ready to be queried with context-aware RAG.
+              <div className="flex items-center gap-2">
+                <h4 className="font-display text-base font-bold text-foreground">
+                  Document Uploaded & Indexed Successfully
+                </h4>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-primary/15 text-primary border border-primary/25">
+                  v{uploadedDoc.version || 1}
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {uploadedDoc.version > 1 ? (
+                  <span className="text-primary font-medium">
+                    Existing document detected: created version v{uploadedDoc.version} and replaced previous vector embeddings in search index.
+                  </span>
+                ) : (
+                  'Your document is now indexed and ready to be queried with context-aware RAG.'
+                )}
               </p>
             </div>
           </div>

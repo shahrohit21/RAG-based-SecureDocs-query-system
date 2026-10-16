@@ -2,17 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
-import { Sidebar } from './components/Sidebar';
-import { Navbar } from './components/Navbar';
-
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { Dashboard } from './pages/Dashboard';
-import { Upload } from './pages/Upload';
-import { Documents } from './pages/Documents';
-import { Chat } from './pages/Chat';
-import { Profile } from './pages/Profile';
+import { ProtectedRoute, Sidebar, Navbar } from './components';
+import { Login, Register, Dashboard, Upload, Documents, Chat, Profile } from './pages';
 
 const queryClient = new QueryClient({
   defaultOptions: {

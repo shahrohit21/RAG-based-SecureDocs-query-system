@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { documentApi } from '../api/documentApi';
 import { DocumentModal } from '../components/DocumentModal';
+import { DocumentVersionHistoryModal } from '../components/DocumentVersionHistoryModal';
 import {
   FileText,
   Trash2,
@@ -10,6 +11,10 @@ import {
   ShieldCheck,
   AlertCircle,
   Plus,
+  History,
+  Archive,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,14 +24,16 @@ export const Documents = () => {
   const [docContent, setDocContent] = useState(null);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [historyDoc, setHistoryDoc] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   // Fetch Documents
   const { data: documents = [], isLoading } = useQuery({
-    queryKey: ['userDocuments'],
-    queryFn: documentApi.getDocuments,
+    queryKey: ['userDocuments', showArchived],
+    queryFn: () => documentApi.getDocuments(showArchived),
   });
 
   // Delete Mutation
@@ -71,11 +78,25 @@ export const Documents = () => {
             My Document Repository
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Manage your uploaded files, monitor PII masking, and view document details.
+            Manage your uploaded files, track version history, and monitor automated PII masking.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Archived Toggle */}
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className={`btn-ghost text-xs py-2 px-3 flex items-center gap-1.5 rounded-xl border transition-all cursor-pointer ${
+              showArchived
+                ? 'bg-primary/10 text-primary border-primary/30 font-semibold'
+                : 'text-muted-foreground border-border hover:text-foreground'
+            }`}
+            title="Toggle previous archived document versions"
+          >
+            <Archive className="w-3.5 h-3.5" />
+            <span>{showArchived ? 'Showing All Versions' : 'Latest Only'}</span>
+          </button>
+
           {/* Search Box */}
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
@@ -84,7 +105,7 @@ export const Documents = () => {
               placeholder="Search filename..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-premium pl-9 py-2 text-xs w-48 sm:w-64"
+              className="input-premium pl-9 py-2 text-xs w-44 sm:w-56"
             />
           </div>
 
@@ -111,6 +132,7 @@ export const Documents = () => {
               <thead className="bg-secondary/60 text-muted-foreground font-display uppercase text-[10px] font-bold tracking-wider border-b border-border">
                 <tr>
                   <th className="py-4 px-6">Document Name</th>
+                  <th className="py-4 px-6">Version</th>
                   <th className="py-4 px-6">File Type</th>
                   <th className="py-4 px-6">Upload Date</th>
                   <th className="py-4 px-6">Size</th>
@@ -125,8 +147,24 @@ export const Documents = () => {
                       <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
                         <FileText className="w-4 h-4" />
                       </div>
-                      <span className="truncate max-w-xs">{doc.original_name}</span>
+                      <div className="truncate max-w-xs">
+                        <span className="truncate block">{doc.original_name}</span>
+                        {!doc.is_latest && (
+                          <span className="text-[10px] text-amber-500 font-mono flex items-center gap-1 mt-0.5">
+                            <Archive className="w-2.5 h-2.5" />
+                            Archived version
+                          </span>
+                        )}
+                      </div>
                     </td>
+
+                    {/* Version Badge */}
+                    <td className="py-4 px-6">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-primary/15 text-primary border border-primary/25 shadow-xs">
+                        v{doc.version || 1}
+                      </span>
+                    </td>
+
                     <td className="py-4 px-6 font-mono text-muted-foreground">
                       <span className="px-2 py-0.5 rounded bg-secondary border border-border text-[10px] font-bold text-foreground">
                         {getFileType(doc.original_name)}
@@ -144,11 +182,21 @@ export const Documents = () => {
                         Protected
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-right space-x-2">
+                    <td className="py-4 px-6 text-right space-x-2 whitespace-nowrap">
+                      {/* Version History Button */}
+                      <button
+                        onClick={() => setHistoryDoc(doc)}
+                        className="btn-ghost py-1 px-2.5 text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer text-muted-foreground hover:text-foreground"
+                        title="View Version History"
+                      >
+                        <History className="w-3.5 h-3.5 text-primary" />
+                        <span>History</span>
+                      </button>
+
                       {/* View Content Button */}
                       <button
                         onClick={() => handleInspectContent(doc.id)}
-                        className="btn-ghost py-1 px-3 text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer"
+                        className="btn-ghost py-1 px-2.5 text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer"
                         title="View Document Content"
                       >
                         <Eye className="w-3.5 h-3.5 text-primary" />
@@ -158,7 +206,7 @@ export const Documents = () => {
                       {/* Delete Button */}
                       <button
                         onClick={() => setDeleteConfirmId(doc.id)}
-                        className="btn-ghost py-1 px-3 text-xs font-medium text-destructive hover:bg-destructive/10 hover:border-destructive/30 inline-flex items-center gap-1.5 cursor-pointer"
+                        className="btn-ghost py-1 px-2.5 text-xs font-medium text-destructive hover:bg-destructive/10 hover:border-destructive/30 inline-flex items-center gap-1.5 cursor-pointer"
                         title="Delete Document"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -199,7 +247,7 @@ export const Documents = () => {
               <span>Delete Document</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Are you sure you want to delete this document? This action will permanently remove it from vector storage.
+              Are you sure you want to delete this document? This action will remove its vector embeddings from search.
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
@@ -229,7 +277,13 @@ export const Documents = () => {
         documentContent={docContent}
         isLoading={isLoadingContent}
       />
+
+      {/* Version History Modal */}
+      <DocumentVersionHistoryModal
+        isOpen={!!historyDoc}
+        onClose={() => setHistoryDoc(null)}
+        document={historyDoc}
+      />
     </div>
   );
 };
-

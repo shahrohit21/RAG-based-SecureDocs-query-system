@@ -19,8 +19,13 @@ export const documentApi = {
     return response.data;
   },
 
-  getDocuments: async () => {
-    const response = await axiosClient.get('/documents');
+  getDocuments: async (includeArchived = false) => {
+    const response = await axiosClient.get(`/documents?include_archived=${includeArchived}`);
+    return response.data;
+  },
+
+  getDocumentHistory: async (documentId) => {
+    const response = await axiosClient.get(`/documents/${documentId}/history`);
     return response.data;
   },
 
