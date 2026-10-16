@@ -16,6 +16,8 @@ class ChatMessage(Base):
     answer = Column(Text, nullable=False)
     confidence_score = Column(Float, default=0.0)
     source_chunks = Column(JSON, nullable=True)  # List of referenced document chunks & metadata
+    session_id = Column(String(36), ForeignKey("chat_sessions.id", ondelete="CASCADE"), nullable=True, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="chat_messages")
+    session = relationship("ChatSession", back_populates="messages")
