@@ -1,34 +1,38 @@
 import pytest
+import uuid
 from backend.app.services.rag.retriever import SecureVectorRetriever
 
 def test_multi_tenant_data_isolation():
     retriever = SecureVectorRetriever()
     
-    user1_id = "user_11111111-1111-1111-1111-111111111111"
-    user2_id = "user_22222222-2222-2222-2222-222222222222"
+    user1_id = f"user_{uuid.uuid4()}"
+    user2_id = f"user_{uuid.uuid4()}"
+    
+    u1_chunk_id = f"u1_{uuid.uuid4()}"
+    u2_chunk_id = f"u2_{uuid.uuid4()}"
     
     chunks_user1 = [
         {
-            "id": "u1_c1",
+            "id": u1_chunk_id,
             "text": "User 1 confidential revenue report for Q3 is $5 Million.",
             "metadata": {
                 "user_id": user1_id,
-                "document_id": "doc_u1",
+                "document_id": f"doc_{user1_id}",
                 "filename": "u1_report.pdf",
-                "chunk_id": "u1_c1"
+                "chunk_id": u1_chunk_id
             }
         }
     ]
 
     chunks_user2 = [
         {
-            "id": "u2_c1",
+            "id": u2_chunk_id,
             "text": "User 2 top secret design architecture blueprint for Quantum Project.",
             "metadata": {
                 "user_id": user2_id,
-                "document_id": "doc_u2",
+                "document_id": f"doc_{user2_id}",
                 "filename": "u2_blueprint.pdf",
-                "chunk_id": "u2_c1"
+                "chunk_id": u2_chunk_id
             }
         }
     ]
