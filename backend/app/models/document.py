@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, JSON
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime, timezone
@@ -19,7 +19,10 @@ class Document(Base):
     chunk_count = Column(Integer, default=0)
     pii_detected_count = Column(Integer, default=0)
     mime_type = Column(String(100), nullable=True)
-    status = Column(String(50), default="processed")  # processed, error, deleting
+    status = Column(String(50), default="processed")  # processed, archived, error, deleting
+    version = Column(Integer, default=1, nullable=False)
+    is_latest = Column(Boolean, default=True, nullable=False)
+    superseded_by_id = Column(String(36), ForeignKey("documents.id"), nullable=True)
     uploaded_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     owner = relationship("User", back_populates="documents")
