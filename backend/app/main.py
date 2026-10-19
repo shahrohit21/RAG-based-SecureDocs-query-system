@@ -8,11 +8,8 @@ from slowapi.errors import RateLimitExceeded
 from backend.app.core.config import settings
 from backend.app.core.logging import logger
 from backend.app.database.session import engine, Base, init_db
-from backend.app.models import user, document, document_chunk, chat, audit_log
-from backend.app.api.auth import router as auth_router
-from backend.app.api.documents import router as doc_router
-from backend.app.api.chat import router as chat_router
-from backend.app.api.analytics import router as analytics_router
+from backend.app.models import user, document, document_chunk, chat, chat_session, audit_log
+from backend.app.api import auth_router, doc_router, chat_router, analytics_router
 
 # Initialize pgvector extension and create DB tables
 init_db()
