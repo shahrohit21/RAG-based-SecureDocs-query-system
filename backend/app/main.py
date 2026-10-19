@@ -73,6 +73,14 @@ def health_check():
         "environment": settings.ENVIRONMENT
     }
 
+@app.get("/ping", tags=["System"])
+def ping_check():
+    """Simple ping endpoint to check service responsiveness."""
+    return {
+        "ping": "pong",
+        "status": "online"
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
